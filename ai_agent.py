@@ -42,7 +42,7 @@ class AIAgent:
         gameover = temp.is_terminal_node()
 
         #Base Cases
-        if is_terminal:
+        if gameover:
             self.nodes_expanded += 1
             if temp.check_win(AI):
                 return (10_000_000 + depth, None)   # AI wins (prefer faster wins)
@@ -57,7 +57,7 @@ class AIAgent:
 
         #Recursive Cases
         if maximizing:
-            best_score = -99999999
+            value = -math.inf
             best_col = valid_locations[len(valid_locations) // 2]  # Prefer center
 
             for col in self._order_moves(valid_locations):
@@ -99,7 +99,7 @@ class AIAgent:
         gameover = temp.is_terminal_node()
 
         #Base Cases
-        if is_terminal:
+        if gameover:
             self.nodes_expanded += 1
             if temp.check_win(AI):
                 return (10_000_000 + depth, None)
@@ -114,7 +114,7 @@ class AIAgent:
 
         # Recursive Cases with Pruning 
         if maximizing:
-            best_score = -99999999
+            value = -math.inf
             best_col = valid_locations[len(valid_locations) // 2]
 
             for col in self._order_moves(valid_locations):

@@ -108,7 +108,7 @@ class GameEngine:
 
         return None
 
-    def is_game_over(self) -> bool:
+    def is_terminal_node(self) -> bool:
         return (
             self.check_win(PLAYER)
             or self.check_win(AI)

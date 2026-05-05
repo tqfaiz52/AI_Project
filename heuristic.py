@@ -6,7 +6,7 @@ import numpy as np
 from game_engine import ROWS, COLS, EMPTY, PLAYER, AI, WINDOW_LENGTH
 
 
-# We changed from 40 to 80 because the AI was letting the player win too easily on 3-in-a-rows.
+# We changed this from 40 to 80 because the AI was letting the player win too easily on 3-in-a-rows.
 WEIGHTS = {
     "four_in_a_row":    1_000_000,   # Immediate win
     "three_in_a_row":   50,          # Three with one open space
@@ -86,7 +86,7 @@ def score_board(board: np.ndarray, piece: int, weights: dict = None) -> int:
 
 
 #Alternative Heuristic Presets for Research Comparison 
-offense_heavy = {
+AGGRESSIVE_WEIGHTS = {
     "four_in_a_row":    1_000_000,
     "three_in_a_row":   100,       # Much higher offensive bias
     "two_in_a_row":     20,
@@ -95,7 +95,7 @@ offense_heavy = {
     "opp_two_block":    -2,
 }
 
-blocker_mode = {
+DEFENSIVE_WEIGHTS = {
     "four_in_a_row":    1_000_000,
     "three_in_a_row":   20,        # Less offensive
     "two_in_a_row":     5,
@@ -104,7 +104,7 @@ blocker_mode = {
     "opp_two_block":    -15,
 }
 
-middle_priority = {
+CENTER_HEAVY_WEIGHTS = {
     "four_in_a_row":    1_000_000,
     "three_in_a_row":   50,
     "two_in_a_row":     10,
@@ -113,9 +113,9 @@ middle_priority = {
     "opp_two_block":    -5,
 }
 
-ai_modes = {
-    "Standard Settings": WEIGHTS,
-    "Aggressive":         offense_heavy,
-    "Defensive":          blocker_mode,
-    "Center-Heavy":       middle_priority,
+HEURISTIC_PRESETS = {
+    "Balanced (Default)": WEIGHTS,
+    "Aggressive":         AGGRESSIVE_WEIGHTS,
+    "Defensive":          DEFENSIVE_WEIGHTS,
+    "Center-Heavy":       CENTER_HEAVY_WEIGHTS,
 }

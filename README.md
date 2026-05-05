@@ -1,5 +1,12 @@
 
 # Connect 4 — Game Playing AI using Adversarial Search
+
+### By:
+* **Tahir shah** — ERP: 30537
+* **Rohan Khatwani** — ERP: 31686
+
+---
+
 ## Project Structure
 
 ```

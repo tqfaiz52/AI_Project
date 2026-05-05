@@ -1,12 +1,3 @@
-"""
-Connect 4 AI - Adversarial Search Engine
-=========================================
-Implements Minimax and Minimax with Alpha-Beta Pruning from scratch.
-Student 2 responsibility: The AI Logic
-
-Key Research Metric: nodes_expanded tracks how many board states each
-algorithm evaluates — proving Alpha-Beta's mathematical superiority.
-"""
 
 import math
 from game_engine import GameEngine, PLAYER, AI, ROWS, COLS
@@ -15,24 +6,18 @@ from heuristic import score_board, WEIGHTS
 
 class AIAgent:
     def __init__(self, depth: int = 5, use_alpha_beta: bool = True, weights: dict = None):
-        """
-        Args:
-            depth: Search depth (higher = stronger AI, slower response)
-            use_alpha_beta: Toggle pruning on/off for comparison research
-            weights: Heuristic weight dictionary
-        """
+    
         self.depth = depth
         self.use_alpha_beta = use_alpha_beta
         self.weights = weights if weights else WEIGHTS
-        self.nodes_expanded = 0   # Research metric: counts board states evaluated
+        self.nodes_expanded = 0   # We use this to compare Minimax vs Alpha-Beta performance
 
     def reset_node_count(self):
         self.nodes_expanded = 0
 
     def get_move(self, engine: GameEngine) -> tuple[int, int]:
-        """
-        Find the best move for AI. Returns (best_col, nodes_expanded).
-        """
+        # Find the best move for AI. Returns (best_col, nodes_expanded).
+    
         self.reset_node_count()
 
         if self.use_alpha_beta:
@@ -45,25 +30,18 @@ class AIAgent:
 
         return col, self.nodes_expanded
 
-    # ─── Pure Minimax (No Pruning) ─────────────────────────────────────────────
+    #Pure Minimax (No Pruning)
 
     def _minimax(self, board, depth: int, maximizing: bool) -> tuple[int, int]:
-        """
-        Classic Minimax algorithm — explores the ENTIRE game tree to given depth.
 
-        Algorithm logic:
-        - Maximizing player (AI) picks the move with the HIGHEST score
-        - Minimizing player (Human) picks the move with the LOWEST score
-        - Recurse until terminal state or depth limit reached
-        """
-        # Create a temporary engine to check terminal conditions
+        # We have to copy the board so we don't mess up the actual game state during search.
         temp = GameEngine()
         temp.board = board
 
         valid_locations = temp.get_valid_locations()
-        is_terminal = temp.is_terminal_node()
+        gameover = temp.is_terminal_node()
 
-        # ── Base Cases ─────────────────────────────────────────────────────────
+        #Base Cases
         if is_terminal:
             self.nodes_expanded += 1
             if temp.check_win(AI):
@@ -77,9 +55,9 @@ class AIAgent:
             self.nodes_expanded += 1
             return (score_board(board, AI, self.weights), None)
 
-        # ── Recursive Cases ────────────────────────────────────────────────────
+        #Recursive Cases
         if maximizing:
-            value = -math.inf
+            best_score = -99999999
             best_col = valid_locations[len(valid_locations) // 2]  # Prefer center
 
             for col in self._order_moves(valid_locations):
@@ -110,30 +88,17 @@ class AIAgent:
 
             return value, best_col
 
-    # ─── Minimax with Alpha-Beta Pruning ──────────────────────────────────────
+    #Minimax with Alpha-Beta Pruning
 
     def _minimax_ab(self, board, depth: int, alpha: float, beta: float,
                     maximizing: bool) -> tuple[int, int]:
-        """
-        Minimax with Alpha-Beta Pruning.
-
-        Alpha-Beta adds two parameters:
-        - alpha: Best score the MAXIMIZER (AI) can guarantee so far
-        - beta:  Best score the MINIMIZER (Human) can guarantee so far
-
-        Pruning rule: If beta <= alpha, this branch can NEVER be chosen
-        by a rational opponent — stop searching it immediately.
-
-        Mathematical guarantee: Alpha-Beta finds the SAME best move as
-        pure Minimax but explores far fewer nodes (up to O(b^(d/2)) vs O(b^d)).
-        """
         temp = GameEngine()
         temp.board = board
 
         valid_locations = temp.get_valid_locations()
-        is_terminal = temp.is_terminal_node()
+        gameover = temp.is_terminal_node()
 
-        # ── Base Cases ─────────────────────────────────────────────────────────
+        #Base Cases
         if is_terminal:
             self.nodes_expanded += 1
             if temp.check_win(AI):
@@ -147,9 +112,9 @@ class AIAgent:
             self.nodes_expanded += 1
             return (score_board(board, AI, self.weights), None)
 
-        # ── Recursive Cases with Pruning ───────────────────────────────────────
+        # Recursive Cases with Pruning 
         if maximizing:
-            value = -math.inf
+            best_score = -99999999
             best_col = valid_locations[len(valid_locations) // 2]
 
             for col in self._order_moves(valid_locations):
@@ -165,7 +130,7 @@ class AIAgent:
 
                 alpha = max(alpha, value)
 
-                # ✂ PRUNING: No minimizer would ever allow this branch
+                #PRUNING
                 if alpha >= beta:
                     break
 
@@ -188,17 +153,15 @@ class AIAgent:
 
                 beta = min(beta, value)
 
-                # ✂ PRUNING: No maximizer would ever allow this branch
+                #PRUNING
                 if alpha >= beta:
                     break
 
             return value, best_col
-
+# Move Ordering: This is an optimization for Alpha-Beta.
+# By checking the center columns first, we find the 'best' moves earlier,
+# which allows the algorithm to prune (skip) more branches.
     def _order_moves(self, valid_locations: list) -> list:
-        """
-        Move ordering optimization: Try center columns first.
-        This makes Alpha-Beta pruning MORE effective because better moves
-        are evaluated earlier, triggering more cutoffs.
-        """
+        
         center = COLS // 2
         return sorted(valid_locations, key=lambda col: abs(col - center))

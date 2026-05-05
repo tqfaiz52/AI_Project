@@ -1,13 +1,3 @@
-"""
-Connect 4 — Algorithm Comparison Research Script
-=================================================
-Runs controlled experiments to compare:
-  - Pure Minimax vs Alpha-Beta Pruning
-  - Node expansion counts at various depths
-  - Different heuristic presets vs win rate
-
-Run this script independently to generate research data for your report.
-"""
 
 import time
 import random
@@ -24,10 +14,7 @@ def separator(title=""):
 
 
 def run_node_comparison(depth: int = 5, num_positions: int = 10):
-    """
-    Compare node counts between Pure Minimax and Alpha-Beta
-    across multiple random mid-game board positions.
-    """
+   
     separator(f"NODE EXPANSION COMPARISON  (depth={depth})")
     print(f"  Testing {num_positions} random mid-game positions\n")
     print(f"  {'Pos':>4}  {'Minimax':>12}  {'Alpha-Beta':>12}  {'Reduction':>10}  {'Speedup':>8}")
@@ -74,20 +61,20 @@ def run_node_comparison(depth: int = 5, num_positions: int = 10):
     if ab_totals:
         avg_ab   = sum(ab_totals)   / len(ab_totals)
         avg_pure = sum(pure_totals) / len(pure_totals)
-        avg_red  = 100 * (avg_pure - avg_ab) / avg_pure
-        avg_spd  = avg_pure / avg_ab
+        averagereductionpct  = 100 * (avg_pure - avg_ab) / avg_pure
+        averagespeedup  = avg_pure / avg_ab
 
         print("  " + "-" * 52)
-        print(f"  {'AVG':>4}  {avg_pure:>12,.0f}  {avg_ab:>12,.0f}  {avg_red:>9.1f}%  {avg_spd:>7.1f}x")
-        print(f"\n  ✓ Alpha-Beta pruned {avg_red:.1f}% of nodes on average")
-        print(f"  ✓ Alpha-Beta is ~{avg_spd:.1f}x faster than pure Minimax")
+        print(f"  {'AVG':>4}  {avg_pure:>12,.0f}  {avg_ab:>12,.0f}  {averagereductionpct:>9.1f}%  {averagespeedup:>7.1f}x")
+        print(f"\n Alpha-Beta pruned {averagereductionpct:.1f}% of nodes on average")
+        print(f" Alpha-Beta is ~{averagespeedup:.1f}x faster than pure Minimax")
 
 
 def run_depth_scaling():
-    """
-    Show how node counts scale with depth for both algorithms.
-    Demonstrates the O(b^d) vs O(b^(d/2)) complexity difference.
-    """
+    
+    #Show how node counts scale with depth for both algorithms.
+    #Demonstrates the O(b^d) vs O(b^(d/2)) complexity difference.
+    
     separator("DEPTH SCALING ANALYSIS")
     print(f"  {'Depth':>6}  {'Minimax':>14}  {'Alpha-Beta':>14}  {'Ratio':>8}")
     print("  " + "-" * 48)
@@ -111,10 +98,7 @@ def run_depth_scaling():
 
 
 def run_heuristic_tournament(games_per_matchup: int = 20):
-    """
-    Pit different heuristic presets against each other.
-    The AI using one heuristic plays as AI, random plays as opponent.
-    """
+    
     separator("HEURISTIC PRESET COMPARISON")
     print(f"  Each preset plays {games_per_matchup} games vs random opponent\n")
     print(f"  {'Heuristic':<20}  {'Wins':>6}  {'Draws':>6}  {'Losses':>7}  {'Win%':>6}")
@@ -161,9 +145,7 @@ def run_heuristic_tournament(games_per_matchup: int = 20):
 
 
 def run_timing_benchmark():
-    """
-    Measure actual wall-clock time for each algorithm at different depths.
-    """
+    
     separator("TIMING BENCHMARK")
     print(f"  {'Depth':>6}  {'Minimax (ms)':>14}  {'AlphaBeta (ms)':>16}  {'Speedup':>8}")
     print("  " + "-" * 50)
@@ -191,35 +173,15 @@ def run_timing_benchmark():
 
 
 if __name__ == "__main__":
-    print("\n" + "█" * 60)
-    print("  CONNECT 4 AI  —  ADVERSARIAL SEARCH RESEARCH REPORT")
+    print("\n" + " " * 60)
+    print("  CONNECT 4 AI ADVERSARIAL SEARCH RESEARCH REPORT")
     print("  Minimax vs Alpha-Beta Pruning Analysis")
-    print("█" * 60)
+ 
 
-    random.seed(42)  # Reproducible results
+    random.seed(31686)  # Reproducible results
 
     run_node_comparison(depth=5, num_positions=8)
     run_depth_scaling()
     run_timing_benchmark()
     run_heuristic_tournament(games_per_matchup=30)
 
-    separator("RESEARCH SUMMARY")
-    print("""
-  KEY FINDINGS:
-  ─────────────
-  1. Alpha-Beta Pruning evaluates ~70-90% fewer nodes than pure
-     Minimax while finding the IDENTICAL best move.
-
-  2. Node reduction grows with depth — at depth 7, Alpha-Beta
-     evaluates ~10x fewer nodes (O(b^3.5) vs O(b^7)).
-
-  3. Move ordering (center columns first) amplifies pruning
-     effectiveness by ensuring better moves are seen first.
-
-  4. The Balanced heuristic (equal offense/defense) achieves
-     the highest win rate in most game scenarios.
-
-  5. Horizon Effect: at depth 3, the AI occasionally walks into
-     traps that become visible at depth 5. This demonstrates
-     why search depth is a critical parameter.
-    """)

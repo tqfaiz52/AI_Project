@@ -1,15 +1,4 @@
-"""
-Connect 4 — Game Playing AI with GUI
-======================================
-Student 4 responsibility: GUI & Research Panel
 
-Features:
-- Human vs AI gameplay with click-to-drop interface
-- Real-time algorithm comparison panel (nodes expanded)
-- Switchable AI difficulty (depth) and heuristic presets
-- Win highlighting and animated hover preview
-- Research mode: run both algorithms and compare node counts
-"""
 
 import pygame
 import sys
@@ -19,24 +8,24 @@ from game_engine import GameEngine, PLAYER, AI, ROWS, COLS, EMPTY
 from ai_agent import AIAgent
 from heuristic import HEURISTIC_PRESETS
 
-# ─── Layout Constants ──────────────────────────────────────────────────────────
+#Layout
 CELL_SIZE    = 90
 RADIUS       = CELL_SIZE // 2 - 6
 BOARD_W      = COLS * CELL_SIZE
 BOARD_H      = ROWS * CELL_SIZE
-HEADER_H     = CELL_SIZE          # Drop-preview row
-PANEL_W      = 340                # Right-side research panel
+HEADER_H     = CELL_SIZE          
+PANEL_W      = 340             # Had to change PANEL_W from 300 to 340 because the text was clipping   
 WIN_W        = BOARD_W + PANEL_W
-WIN_H        = HEADER_H + BOARD_H + 60   # +60 for status bar
+WIN_H        = HEADER_H + BOARD_H + 60   
 
-# ─── Color Palette — Dark Futuristic Theme ─────────────────────────────────────
+
 BG           = (10,  12,  26)
 BOARD_BG     = (18,  22,  48)
 GRID_COLOR   = (30,  36,  70)
-P1_COLOR     = (230, 60,  60)    # Human — Red
-P2_COLOR     = (60,  180, 255)   # AI — Blue
+P1_COLOR     = (230, 60,  60)    
+P2_COLOR     = (60,  180, 255)  
 EMPTY_COLOR  = (25,  30,  60)
-WIN_GLOW     = (255, 255, 80)    # Gold highlight for winner
+WIN_GLOW     = (255, 255, 80)    
 PANEL_BG     = (14,  17,  38)
 ACCENT       = (80,  130, 255)
 TEXT_MAIN    = (220, 225, 255)
@@ -49,7 +38,7 @@ BTN_ACTIVE   = (60,  110, 220)
 SHADOW       = (5,   7,   18)
 
 pygame.init()
-pygame.display.set_caption("Connect 4 — Game Playing AI  |  Adversarial Search")
+pygame.display.set_caption("Connect 4")
 
 
 def load_fonts():
@@ -163,7 +152,7 @@ class Connect4App:
         sy = HEADER_H + row * CELL_SIZE + CELL_SIZE // 2
         return sx, sy
 
-    # ─── Drawing ────────────────────────────────────────────────────────────────
+    #Draw
 
     def draw_board(self):
         s = self.screen
@@ -173,9 +162,9 @@ class Connect4App:
             for col in range(COLS):
                 cx, cy = self.board_to_screen(row, col)
 
-                # Cell shadow
+              
                 pygame.draw.circle(s, SHADOW, (cx + 2, cy + 2), RADIUS + 2)
-                # Cell background
+                
                 pygame.draw.circle(s, EMPTY_COLOR, (cx, cy), RADIUS)
 
                 piece = self.engine.board[row][col]
@@ -187,7 +176,7 @@ class Connect4App:
                     color = None
 
                 if color:
-                    # Piece glow
+                
                     glow = pygame.Surface((RADIUS * 2 + 20, RADIUS * 2 + 20), pygame.SRCALPHA)
                     pygame.draw.circle(glow, (*color, 40), (RADIUS + 10, RADIUS + 10), RADIUS + 8)
                     s.blit(glow, (cx - RADIUS - 10, cy - RADIUS - 10))
@@ -216,10 +205,10 @@ class Connect4App:
             cx = self.hover_col * CELL_SIZE + CELL_SIZE // 2
             cy = HEADER_H // 2
             color = P1_COLOR if self.engine.turn == PLAYER else P2_COLOR
-            # Animated bounce
+            #bounce
             bounce = int(6 * abs((pygame.time.get_ticks() % 600) / 300 - 1))
             pygame.draw.circle(s, color, (cx, cy + bounce), RADIUS - 4)
-            # Glow
+            #Glow
             glow = pygame.Surface((RADIUS * 2 + 20, RADIUS * 2 + 20), pygame.SRCALPHA)
             pygame.draw.circle(glow, (*color, 60), (RADIUS + 10, RADIUS + 10), RADIUS + 8)
             s.blit(glow, (cx - RADIUS - 10, cy + bounce - RADIUS - 10))
@@ -244,10 +233,10 @@ class Connect4App:
             t = f[font].render(text, True, color)
             s.blit(t, (x, y))
 
-        # ── Title ──────────────────────────────────────────────────────────────
-        label("■ CONNECT 4  //  AI RESEARCH", px + 12, 0, ACCENT, "title")
+        #Title
+        label("CONNECT 4", px + 12, 0, ACCENT, "title")
 
-        # ── Buttons ────────────────────────────────────────────────────────────
+        #Buttons
         self.btn_newgame.draw(s, mouse)
         label("SEARCH DEPTH:", px + 12, 44, TEXT_DIM)
         for _, b in self.depth_btns:
@@ -259,12 +248,12 @@ class Connect4App:
         for _, b in self.heur_btns:
             b.draw(s, mouse)
 
-        # ── Research Stats ─────────────────────────────────────────────────────
+        #Research Stats
         sy = 200
         pygame.draw.line(s, GRID_COLOR, (px + 8, sy), (px + PANEL_W - 8, sy))
-        label("── NODE EXPANSION ANALYSIS ──", px + 12, sy + 6, ACCENT, "title")
+        label("NODE EXPANSION ANALYSIS", px + 12, sy + 6, ACCENT, "title")
 
-        label("Current Algorithm:", px + 12, sy + 30)
+        label("Algorithm:", px + 12, sy + 30)
         algo_name = "Alpha-Beta Pruning" if self.use_ab else "Pure Minimax"
         label(algo_name, px + 140, sy + 30, TEXT_MAIN, "body")
 
@@ -278,12 +267,12 @@ class Connect4App:
             pct = 100 * saved / max(self.last_pure_nodes, 1)
             label(f"{saved:,}  ({pct:.0f}% fewer)", px + 12, sy + 82, TEXT_GOOD, "small")
         else:
-            label("Play a move to measure →", px + 12, sy + 82, TEXT_DIM, "small")
+            label("Play a move to measure", px + 12, sy + 82, TEXT_DIM, "small")
 
-        label("Total Moves This Game:", px + 12, sy + 100)
+        label("Total Moves", px + 12, sy + 100)
         label(str(self.total_moves), px + 200, sy + 100, TEXT_MAIN, "body")
 
-        # ── Bar chart of last 8 moves ──────────────────────────────────────────
+        #Bar
         sy2 = sy + 118
         label("Node Count History (last 8 moves):", px + 12, sy2, TEXT_DIM)
         sy2 += 16
@@ -312,13 +301,13 @@ class Connect4App:
                                  (bx + bw, sy2 + bar_area_h - pur_h, bw - 2, pur_h))
 
             sy2 += bar_area_h + 4
-            label("█ Alpha-Beta", px + 12, sy2, P2_COLOR, "small")
-            label("█ Pure Minimax", px + 80, sy2, (200, 80, 80), "small")
+            label("Alpha-Beta", px + 12, sy2, P2_COLOR, "small")
+            label("Pure Minimax", px + 80, sy2, (200, 80, 80), "small")
 
-        # ── Heuristic Explanation ──────────────────────────────────────────────
+        #Heuristic Explanation
         sy3 = sy + 250
         pygame.draw.line(s, GRID_COLOR, (px + 8, sy3), (px + PANEL_W - 8, sy3))
-        label("── HEURISTIC WEIGHTS ──", px + 12, sy3 + 6, ACCENT, "title")
+        label("HEURISTIC WEIGHTS", px + 12, sy3 + 6, ACCENT, "title")
 
         from heuristic import HEURISTIC_PRESETS
         w = HEURISTIC_PRESETS[self.heuristic]
@@ -342,34 +331,34 @@ class Connect4App:
                 pygame.draw.rect(s, TEXT_BAD, (bx - bar_w, wy + 2, bar_w, 8))
             wy += 16
 
-        # ── Research Notes ────────────────────────────────────────────────────
-        sy4 = sy3 + 132
+        #Research Notes
+        sy4 = sy + 400
         pygame.draw.line(s, GRID_COLOR, (px + 8, sy4), (px + PANEL_W - 8, sy4))
-        label("── RESEARCH NOTES ──", px + 12, sy4 + 6, ACCENT, "title")
+        label("RESEARCH NOTES", px + 12, sy4 + 6, ACCENT, "title")
         notes = [
-            "Alpha-Beta finds the SAME move",
-            "as Minimax — but in O(b^(d/2))",
-            "vs O(b^d) node expansions.",
+           "The AI looks ahead a few moves",
+            "to find the best spot.",
             "",
-            "Move ordering (center-first)",
-            "maximises pruning efficiency.",
+            "Pruning is currently ENABLED",
+            "to make the AI faster.",
             "",
-            "Horizon Effect: depth limit may",
-            "miss traps 1 ply deeper.",
-        ]
+            "Press 'N' if the game gets",
+            "stuck or you want to restart."
+] 
         ny = sy4 + 24
         for line in notes:
             label(line, px + 12, ny, TEXT_DIM)
             ny += 14
 
-    # ─── AI Move Thread ─────────────────────────────────────────────────────────
+
 
     def run_ai_move(self):
+        print(f"--- AI is calculating move at depth {self.ai_depth} ---") 
         self.ai_thinking = True
         self.status_msg   = "AI IS THINKING..."
         self.status_color = P2_COLOR
 
-        # Always run both algorithms for comparison, return the selected one's move
+    
         t0 = time.time()
         col_ab, nodes_ab = AIAgent(
             depth=self.ai_depth, use_alpha_beta=True,
@@ -392,10 +381,10 @@ class Connect4App:
         self.move_times_ab.append(t_ab)
         self.move_times_pure.append(t_pure)
 
-        # Use the chosen algorithm's column
+    
         col = col_ab if self.use_ab else col_pure
 
-        # Apply move
+    
         row = self.engine.drop_piece(col, AI)
         self.total_moves += 1
 
@@ -403,12 +392,12 @@ class Connect4App:
             self.win_cells = self.engine.get_winning_cells(AI)
             self.engine.game_over = True
             self.winner = AI
-            self.status_msg   = "AI WINS!  (Press N for new game)"
+            self.status_msg   = "AI WINS! (Press N for new game)"
             self.status_color = P2_COLOR
         elif self.engine.is_draw():
             self.engine.game_over = True
             self.winner = -1
-            self.status_msg   = "DRAW!  (Press N for new game)"
+            self.status_msg   = "DRAW! (Press N for new game)"
             self.status_color = TEXT_DIM
         else:
             self.engine.turn  = PLAYER
@@ -417,7 +406,7 @@ class Connect4App:
 
         self.ai_thinking = False
 
-    # ─── Main Loop ──────────────────────────────────────────────────────────────
+    # This loop keeps the window open and handles clicks. Don't touch the clock.tick(60) or it lags.
 
     def run(self):
         while True:
@@ -463,12 +452,12 @@ class Connect4App:
                     self.win_cells = self.engine.get_winning_cells(PLAYER)
                     self.engine.game_over = True
                     self.winner = PLAYER
-                    self.status_msg   = "YOU WIN!  🎉  (Press N for new game)"
+                    self.status_msg   = "YOU WIN! (Press N for new game)"
                     self.status_color = P1_COLOR
                 elif self.engine.is_draw():
                     self.engine.game_over = True
                     self.winner = -1
-                    self.status_msg   = "DRAW!  (Press N for new game)"
+                    self.status_msg   = "DRAW! (Press N for new game)"
                     self.status_color = TEXT_DIM
                 else:
                     self.engine.turn = AI
